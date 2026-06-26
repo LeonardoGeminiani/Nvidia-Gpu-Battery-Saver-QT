@@ -244,6 +244,7 @@ class MainWindow(QWidget):
         self.setWindowTitle("GPU Battery Saver")
         self.setMinimumWidth(400)
         self._worker = None
+        self._switching = False
         self._current = core.get_mode()
         self._build_ui()
         self._build_tray()
@@ -281,7 +282,9 @@ class MainWindow(QWidget):
             menu.addAction(act)
         menu.addSeparator()
         menu.addAction("Show", self.show)
-        menu.addAction("Quit", QApplication.quit)
+        self._quit_action = QAction("Quit", self)
+        self._quit_action.triggered.connect(QApplication.quit)
+        menu.addAction(self._quit_action)
         self.tray.setContextMenu(menu)
         self.tray.activated.connect(self._tray_activated)
 
@@ -304,14 +307,18 @@ class MainWindow(QWidget):
     def switch(self, mode: str):
         if mode == self._current:
             return
+        self._switching = True
+        self._quit_action.setEnabled(False)
         self.modes_tab.set_enabled(False)
-        self.modes_tab.status.setText("Switching…")
+        self.modes_tab.status.setText("Rebuilding initramfs… do not close")
         rtd3 = self.modes_tab.rtd3_value()
         self._worker = _SwitchWorker(mode, rtd3)
         self._worker.done.connect(lambda ok: self._on_done(ok, mode))
         self._worker.start()
 
     def _on_done(self, ok: bool, mode: str):
+        self._switching = False
+        self._quit_action.setEnabled(True)
         self.modes_tab.set_enabled(True)
         if ok:
             self._current = mode
@@ -328,7 +335,8 @@ class MainWindow(QWidget):
 
     def closeEvent(self, event):
         event.ignore()
-        self.hide()
+        if not self._switching:
+            self.hide()
 
 
 if __name__ == "__main__":
