@@ -1,11 +1,8 @@
 # GPU Battery Saver
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/LeonardoGeminiani/Nvidia-Gpu-Battery-Saver-QT/refs/heads/main/screenshots/app.png" width="64">
+  <img src="https://raw.githubusercontent.com/LeonardoGeminiani/Nvidia-Gpu-Battery-Saver-QT/refs/heads/main/screenshots/app.png">
 </div>
-
-
-![app screenshot](screenshots/app.png)
 
 A minimal GUI app to switch GPU modes on Optimus laptops (Intel + Nvidia) using [envycontrol](https://github.com/bayasdev/envycontrol).
 
