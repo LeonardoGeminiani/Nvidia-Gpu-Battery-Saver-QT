@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QLabel, QSystemTrayIcon, QMenu, QMessageBox, QTabWidget,
@@ -76,6 +77,9 @@ Left-click to show/hide the window. Right-click for a quick-switch menu.</p>
 This lets it distinguish <i>Hybrid</i> from <i>Hybrid + RTD3</i> across reboots
 (both look the same to envycontrol's <code>--query</code>).</p>
 """
+
+
+_APP_ICON = QIcon(str(Path(__file__).resolve().parent / "assets" / "icon.svg"))
 
 
 def _circle_icon(color: str, size: int = 22) -> QIcon:
@@ -282,6 +286,7 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("GPU Battery Saver")
+        self.setWindowIcon(_APP_ICON)
         self.setMinimumWidth(400)
         self._worker = None
         self._switching = False
@@ -383,6 +388,7 @@ class MainWindow(QWidget):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
+    app.setWindowIcon(_APP_ICON)
     win = MainWindow()
     if "--tray-only" not in sys.argv:
         win.show()
