@@ -77,10 +77,10 @@ def set_autostart(enabled: bool):
     if enabled:
         AUTOSTART_FILE.parent.mkdir(parents=True, exist_ok=True)
         if appimage := os.environ.get("APPIMAGE"):
-            exec_line = f'"{appimage}"'
+            exec_line = f'"{appimage}" --tray-only'
         else:
             gui = Path(__file__).resolve().parent / "gui.py"
-            exec_line = f'"{sys.executable}" "{gui}"'
+            exec_line = f'"{sys.executable}" "{gui}" --tray-only'
         AUTOSTART_FILE.write_text(
             "[Desktop Entry]\n"
             "Type=Application\n"

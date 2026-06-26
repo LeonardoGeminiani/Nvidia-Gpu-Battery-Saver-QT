@@ -384,5 +384,6 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
     win = MainWindow()
-    win.show()
+    if "--tray-only" not in sys.argv:
+        win.show()
     sys.exit(app.exec())
