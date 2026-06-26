@@ -1,18 +1,13 @@
 #!/bin/bash
-# Installs GpuBatterySaver to the system.
-# Usage: sudo bash install.sh [--prefix /usr/local]
+# Installs GpuBatterySaver to the user's local directory (no sudo needed).
+# Usage: bash install.sh [--prefix ~/.local]
 set -e
 
-PREFIX="/usr/local"
+PREFIX="${HOME}/.local"
 if [[ "$1" == "--prefix" && -n "$2" ]]; then
     PREFIX="$2"
 fi
 INSTALL_DIR="$PREFIX/lib/gpubatterysaver"
-
-if [ "$EUID" -ne 0 ]; then
-    echo "Run with sudo: sudo bash install.sh"
-    exit 1
-fi
 
 echo ">>> Installing to $PREFIX..."
 
@@ -28,6 +23,7 @@ python3 -m venv "$INSTALL_DIR/venv"
 "$INSTALL_DIR/venv/bin/pip" install --quiet -r requirements.txt
 
 # Launcher script
+mkdir -p "$PREFIX/bin"
 cat > "$PREFIX/bin/gpubatterysaver" <<EOF
 #!/bin/bash
 exec "$INSTALL_DIR/venv/bin/python" "$INSTALL_DIR/gui.py" "\$@"
@@ -46,7 +42,7 @@ sed -i "s|^Exec=.*|Exec=$PREFIX/bin/gpubatterysaver|" \
 install -Dm644 assets/icon.svg \
     "$PREFIX/share/icons/hicolor/scalable/apps/gpubatterysaver.svg"
 
-# Refresh icon cache
+# Refresh icon/desktop caches (user-level, no root needed)
 if command -v gtk-update-icon-cache &>/dev/null; then
     gtk-update-icon-cache -qf "$PREFIX/share/icons/hicolor" 2>/dev/null || true
 fi
@@ -56,3 +52,6 @@ fi
 
 echo ""
 echo "Done. Run: gpubatterysaver"
+echo ""
+echo "Make sure ~/.local/bin is on your PATH. If not, add this to ~/.bashrc or ~/.profile:"
+echo '  export PATH="$HOME/.local/bin:$PATH"'

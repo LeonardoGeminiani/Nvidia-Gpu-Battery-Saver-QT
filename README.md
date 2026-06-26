@@ -33,12 +33,12 @@ bash setup.sh
 
 ---
 
-## Option 2 — Install to system
+## Option 2 — Install to user directory (no sudo)
 
-Copies the app to `/usr/local/lib/gpubatterysaver/`, creates a local venv there with all deps, adds a launcher to `/usr/local/bin/`, and registers the `.desktop` entry.
+Copies the app to `~/.local/lib/gpubatterysaver/`, creates a venv there with all deps, adds a launcher to `~/.local/bin/`, and registers the `.desktop` entry under `~/.local/share/`.
 
 ```bash
-sudo bash install.sh
+bash install.sh
 ```
 
 Then run from anywhere:
@@ -48,15 +48,20 @@ gpubatterysaver
 
 Or launch it from your application menu.
 
+> **Note:** `~/.local/bin` must be on your `PATH`. On Fedora/Ubuntu it usually is by default. If not, add this to `~/.bashrc` or `~/.profile`:
+> ```bash
+> export PATH="$HOME/.local/bin:$PATH"
+> ```
+
 To remove:
 ```bash
-sudo bash uninstall.sh
+bash uninstall.sh
 ```
 
 Both scripts accept `--prefix` to change the install root:
 ```bash
-sudo bash install.sh --prefix /usr
-sudo bash uninstall.sh --prefix /usr
+bash install.sh --prefix /usr/local      # system-wide (needs sudo)
+bash uninstall.sh --prefix /usr/local
 ```
 
 ---
@@ -135,11 +140,11 @@ GpuBatterySaver/
 ├── requirements-build.txt   # Build deps (adds pyinstaller)
 ├── setup.sh                 # Local dev venv setup
 ├── build.sh                 # AppImage build
-├── install.sh               # System install
-├── uninstall.sh             # System uninstall
+├── install.sh               # User-local install (no sudo)
+├── uninstall.sh             # User-local uninstall (no sudo)
 ├── gpubatterysaver.desktop  # Desktop entry
 └── assets/
     └── icon.svg
 ```
 
-State (last mode + RTD3 level) is saved to `~/.config/gpubatterysaver/state.json`.
+State (last mode, RTD3 level, and custom colors) is saved to `~/.config/gpubatterysaver/state.json`.

@@ -1,16 +1,11 @@
 #!/bin/bash
-# Removes a system-installed GpuBatterySaver.
-# Usage: sudo bash uninstall.sh [--prefix /usr/local]
+# Removes a user-installed GpuBatterySaver.
+# Usage: bash uninstall.sh [--prefix ~/.local]
 set -e
 
-PREFIX="/usr/local"
+PREFIX="${HOME}/.local"
 if [[ "$1" == "--prefix" && -n "$2" ]]; then
     PREFIX="$2"
-fi
-
-if [ "$EUID" -ne 0 ]; then
-    echo "Run with sudo: sudo bash uninstall.sh"
-    exit 1
 fi
 
 echo ">>> Removing GpuBatterySaver from $PREFIX..."
