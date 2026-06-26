@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=GPU Battery Saver
+Comment=Switch GPU mode to save battery
+Exec=gpubatterysaver
+Icon=gpubatterysaver
+Type=Application
+Categories=System;Settings;HardwareSettings;
+Keywords=gpu;battery;nvidia;power;optimus;envycontrol;
+StartupNotify=false

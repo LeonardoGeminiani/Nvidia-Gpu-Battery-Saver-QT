@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+build/
+*.AppImage
+*.pyc
+.claude/
