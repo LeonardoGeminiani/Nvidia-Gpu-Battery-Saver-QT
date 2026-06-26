@@ -1,5 +1,6 @@
 # GPU Battery Saver
 
+![app screenshot](screenshots/app.png)
 
 A minimal GUI app to switch GPU modes on Optimus laptops (Intel + Nvidia) using [envycontrol](https://github.com/bayasdev/envycontrol).
 
