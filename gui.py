@@ -106,6 +106,7 @@ class ModesTab(QWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self._win = parent
+        self._selected: str | None = None
         layout = QVBoxLayout(self)
         layout.setSpacing(8)
         layout.setContentsMargins(12, 12, 12, 12)
@@ -118,9 +119,8 @@ class ModesTab(QWidget):
         self.buttons: dict[str, QPushButton] = {}
         for mode in MODES:
             btn = QPushButton(LABELS[mode])
-            btn.setCheckable(True)
             btn.setMinimumHeight(36)
-            btn.clicked.connect(lambda _, m=mode: self._win.switch(m))
+            btn.clicked.connect(lambda _, m=mode: self._select(m))
             layout.addWidget(btn)
             self.buttons[mode] = btn
 
@@ -145,24 +145,64 @@ class ModesTab(QWidget):
         note.setStyleSheet("font-size: 10px; color: #777;")
         layout.addWidget(note)
 
+        sep2 = QFrame()
+        sep2.setFrameShape(QFrame.Shape.HLine)
+        sep2.setStyleSheet("color: #444;")
+        layout.addWidget(sep2)
+
+        self.switch_btn = QPushButton("Switch")
+        self.switch_btn.setMinimumHeight(40)
+        self.switch_btn.setEnabled(False)
+        self.switch_btn.clicked.connect(self._do_switch)
+        layout.addWidget(self.switch_btn)
+
+    def _select(self, mode: str):
+        self._selected = mode
+        self._refresh_styles()
+        self.switch_btn.setEnabled(mode != self._win._current)
+
+    def _do_switch(self):
+        if self._selected and self._selected != self._win._current:
+            self._win.switch(self._selected)
+
+    def _refresh_styles(self):
+        current = self._win._current
+        colors = core.get_colors()
+        for mode, btn in self.buttons.items():
+            color = colors.get(mode, "#888")
+            if mode == current:
+                btn.setStyleSheet(f"background:{color}; color:#000; font-weight:bold;")
+            elif mode == self._selected:
+                btn.setStyleSheet(
+                    f"border: 2px solid {color}; color: {color}; font-weight: bold;"
+                )
+            else:
+                btn.setStyleSheet("")
+
     def rtd3_value(self) -> int:
         return self.rtd3_box.currentData()
 
     def refresh(self, current: str):
-        colors = core.get_colors()
-        color = colors.get(current, "#888")
+        if self._selected is None:
+            self._selected = current
         self.status.setText(f"Current: {LABELS.get(current, current)}")
-        for mode, btn in self.buttons.items():
-            active = mode == current
-            btn.setChecked(active)
-            btn.setStyleSheet(
-                f"background:{color}; color:#000; font-weight:bold;" if active else ""
-            )
+        self._refresh_styles()
+        self.switch_btn.setEnabled(self._selected != current)
+
+    def reset_selection(self):
+        self._selected = self._win._current
+        self._refresh_styles()
+        self.switch_btn.setEnabled(False)
 
     def set_enabled(self, enabled: bool):
         for btn in self.buttons.values():
             btn.setEnabled(enabled)
         self.rtd3_box.setEnabled(enabled)
+        self.switch_btn.setEnabled(
+            enabled
+            and self._selected is not None
+            and self._selected != self._win._current
+        )
 
 
 class SettingsTab(QWidget):
@@ -322,6 +362,7 @@ class MainWindow(QWidget):
         self.modes_tab.set_enabled(True)
         if ok:
             self._current = mode
+            self.modes_tab.reset_selection()
             self._refresh()
             QMessageBox.information(
                 self, "Reboot required",
